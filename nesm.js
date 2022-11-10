@@ -8,30 +8,26 @@ import { Command } from "commander";
 
 async function main() {
   // GLOBAL VALUES
+  // Read in package metadata for referencing in various commands
   const package_json = JSON.parse(
     await readFile(new URL("package.json", import.meta.url))
   );
 
-  const program = new Command();
-
-  program
+  // Process command line arguments
+  const program = new Command()
     .version(
       `Neatest Executable Supply Machine Version ${package_json.version}`,
       "-v, --version"
     )
     .usage("[OPTIONS] FILE")
-    .option("-f, --flag", "Detects if the flag is present.")
-    .option("-c, --custom <value>", "Overwriting value.", "Default")
     .parse(process.argv);
 
-  const options = program.opts();
+  program.options = program.opts();
 
-  const flag = options.flag ? "Flag is present." : "Flag is not present.";
-
-  console.log("Flag:", `${flag}`);
-  console.log("Custom:", `${options.custom}`);
+  console.log(program.options);
 }
 
+// Detect if this is the main module and if so run main
 if (import.meta.url.endsWith(process.argv[1])) {
   main();
 }
