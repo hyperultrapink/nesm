@@ -4,8 +4,10 @@
 
 "use strict";
 
+import * as path from "path";
 import { readFile } from "fs/promises";
 import { Command, Argument } from "commander";
+import { extensions } from "./lib/constants.js";
 
 async function main() {
   // GLOBAL VALUES
@@ -13,7 +15,8 @@ async function main() {
   const package_json = JSON.parse(
     await readFile(new URL("package.json", import.meta.url))
   );
-  // assembly file to be assembled
+
+  // assembly file to be translated
   let input_file = "";
 
   // Process command line arguments
@@ -29,6 +32,9 @@ async function main() {
     .usage("[options] [file]")
     .argument("[file]", "assembly file to translate.")
     .action((file) => {
+      if (!file) {
+        throw new Error("No assembly file given.");
+      }
       console.log(`assembling: ${file}`);
       input_file = file;
     })
@@ -36,7 +42,13 @@ async function main() {
 
   program.options = program.opts();
 
-  console.log(program.options);
+  let program_name = path.parse(input_file).name;
+  let listing_name = program_name + "." + extensions.lst;
+  let symbols_name = program_name + "." + extensions.ndb;
+  let rom_name = program_name + "." + extensions.rom;
+
+  console.log(`${program_name} translated successfully!`);
+  return 0;
 }
 
 // Detect if this is the main module and if so run main
