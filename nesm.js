@@ -43,6 +43,8 @@ async function main() {
   program.options = program.opts();
 
   let program_name = path.parse(input_file).name;
+  let program_directory = path.parse(input_file).dir;
+  let output_directory = program_directory + "build";
   let listing_name = program_name + "." + extensions.lst;
   let symbols_name = program_name + "." + extensions.ndb;
   let rom_name = program_name + "." + extensions.rom;
