@@ -7,12 +7,12 @@
 import * as path from "path";
 import { readFile } from "fs/promises";
 import { Command, Argument } from "commander";
-import { extensions } from "./lib/constants.js";
 import {
   base_instruction_set,
   pseudo_instruction_set,
-} from "./lib/instructions_base.js";
-import * as nes from "./lib/nes.js";
+} from "./lib/instructions.js";
+import * as nesm from "./lib/lib.js";
+import * as nes from "./lib/machine_nes.js";
 
 async function main() {
   // read in package metadata for referencing in various commands
@@ -35,7 +35,7 @@ async function main() {
     )
     .usage("[options] <assembly file>")
     .argument("[file]", "assembly file to translate.")
-    .option("-h, --headerless", `Skip header generation for ROM files.`, false)
+    .option("-l, --headerless", `Skip header generation for ROM files.`, false)
     .option("-m, --metrics", "Show various metrics after translation", false)
     .option("-s, --space", "Show segment and ROM bank usage.", false)
     .action((file) => {
@@ -52,9 +52,9 @@ async function main() {
   let program_name = path.parse(input_file).name;
   let program_directory = path.parse(input_file).dir;
   let output_directory = program_directory + "build";
-  let listing_name = program_name + "." + extensions.lst;
-  let symbols_name = program_name + "." + extensions.ndb;
-  let rom_name = program_name + "." + extensions.rom;
+  let listing_name = program_name + "." + nes.extensions.lst;
+  let symbols_name = program_name + "." + nes.extensions.ndb;
+  let rom_name = program_name + "." + nes.extensions.rom;
 
   // load assembly to be processed into memory
   let input_assembly;
@@ -78,23 +78,25 @@ async function main() {
   let machine_instruction_set = nes.machine_instruction_set;
 
   // translate assembly to machine code
+  // TODO:
 
   // write header and rom to output files
+  // TODO:
 
   // report segment and ROM usage
   if (program.options.space) {
-    console.log("Cartridge Segment Space Usage:");
-    console.log("Cartridge ROM Space Usage:");
+    console.log(`Cartridge Segment Space Usage: ${nesm.calculate_segment_usage()}`);
+    console.log(`Cartridge ROM Space Usage: ${nesm.calculate_rom_usage()}`);
   }
 
   // report function addresses and metrics
   if (program.options.metrics) {
-    console.log("Cartridge ROM function addresses:");
-    console.log("Code Size:");
-    console.log("Total Instruction Calls");
+    console.log(`Code Size: ${nesm.calculate_code_size()}`);
+    console.log(`Instruction Used: ${nesm.calculate_total_instructions_used()}`);
+    console.log(`Cartridge ROM function addresses: \n ${nesm.get_rom_addresses()}`);
   }
 
-  console.log(`${program_name} translated successfully!`);
+  console.log(`"${program_name}" translated successfully!`);
 
   return 0;
 }
